@@ -1,5 +1,7 @@
 # WordGuessServer
-A word guessing game server made using netcat and sockets in C.
+
+A word guessing game server made using netcat and sockets in C. The game maintains a new connection queue and can handle multiple users playing at once. Client connects and disconnects are handled smoothly, and all memory leaks were expelled using Valgrind.
+                        
 
 ## How to Play
 
