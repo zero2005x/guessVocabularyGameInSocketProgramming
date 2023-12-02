@@ -12,10 +12,11 @@ int main()
     struct sockaddr_in serv_addr;
     char buffer[1024] = {0};
 
-    // 初始化Winsock
+     // Initialize Winsock
     WSAStartup(MAKEWORD(2, 2), &wsaData);
     sock = socket(AF_INET, SOCK_STREAM, 0);
 
+    // Setup the client socket
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(8080);
     serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
@@ -32,10 +33,11 @@ int main()
             break;
         }
 
+           
         buffer[bytesReceived] = '\0';
         std::string response(buffer);
 
-        // 忽略心跳包的回應
+        // Ignore heartbeat acknowledgements
         if (response.find("heartbeat acknowledged") != std::string::npos)
         {
             continue;
@@ -43,6 +45,7 @@ int main()
 
         std::cout << response << std::endl;
 
+        // Check for game end or play again query
         if (response.find("Game over") != std::string::npos ||
             response.find("Congratulations") != std::string::npos ||
             response.find("Do you want to play again?") != std::string::npos)
@@ -54,10 +57,11 @@ int main()
             send(sock, input.c_str(), input.length(), 0);
 
             if (input == "no")
-                break; // 如果選擇不繼續，則跳出循環
+                break; // Exit loop if player chooses not to continue
         }
         else
         {
+            // Regular guess input
             std::cout << "Guess a letter: ";
             std::string input;
             std::getline(std::cin, input);
@@ -71,11 +75,12 @@ int main()
                 std::cout << "You did not enter a letter. Please try again." << std::endl;
             }
 
-            // 發送心跳包
+             // Send a heartbeat message
             std::string heartbeat = "heartbeat";
             send(sock, heartbeat.c_str(), heartbeat.size(), 0);
         }
     }
+    // Cleanup
     closesocket(sock);
     WSACleanup();
     return 0;
